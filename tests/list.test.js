@@ -58,6 +58,25 @@ test('dummy returns one', () => {
   expect(result).toBe(1)
 })
 
+describe('Blog with most likes', () => {
+  test('Most likes of a single blog', () => {
+    const temp_blogs = [blogs[0]]
+
+    const result = listHelper.favoriteBlog(temp_blogs)
+    expect(result).toEqual(blogs[0])
+  })
+  test('Most likes of several blogs', () => {
+    const result = listHelper.favoriteBlog(blogs)
+    console.log(result)
+    expect(result).toEqual(blogs[2])
+  })
+  test('Most likes of empty list', () => {
+    const temp_blogs = []
+    const result = listHelper.favoriteBlog(temp_blogs)
+    expect(result).toEqual({})
+  })
+})
+
 describe('Total likes of a blog list', () => {
   test('Total likes of a single blog', () => {
     const temp_blogs = [blogs[0]]
