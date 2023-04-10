@@ -26,6 +26,25 @@ const mostBlogs = (blogs) => {
   return blogs.length === 0 ? {} : { author: maxPartition[0].author, blogs: maxPartition.length }
 }
 
+const mostLikes = (blogs) => {
+  var partitions = lodash.groupBy(blogs, blog => blog.author)
+  Object.keys(partitions)
+    .forEach(key => partitions[key] =
+      partitions[key].reduce(
+        (oldLikes, newElement) => oldLikes + newElement.likes,
+        0
+      ))
+
+  const keyWithHighestValue = Object.keys(partitions).reduce(
+    (oldKey, newKey) => partitions[newKey] >= partitions[oldKey] ? newKey : oldKey,
+    Object.keys(partitions)[0]
+  )
+
+  return blogs.length === 0 ?
+    {} :
+    { author: keyWithHighestValue, likes: partitions[keyWithHighestValue] }
+}
+
 module.exports = {
-  dummy, totalLikes, favoriteBlog, mostBlogs
+  dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes
 }

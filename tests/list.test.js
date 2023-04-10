@@ -67,10 +67,9 @@ describe('Blog with most likes', () => {
   })
   test('Most likes of several blogs', () => {
     const result = listHelper.favoriteBlog(blogs)
-    console.log(result)
     expect(result).toEqual(blogs[2])
   })
-  test('Most likes of empty list', () => {
+  test('Most likes of an empty list', () => {
     const temp_blogs = []
     const result = listHelper.favoriteBlog(temp_blogs)
     expect(result).toEqual({})
@@ -86,10 +85,9 @@ describe('Author with most blogs', () => {
   })
   test('Author with most blogs of several blogs', () => {
     const result = listHelper.mostBlogs(blogs)
-    console.log(result)
     expect(result).toEqual({ author: "Robert C. Martin", blogs: 3 })
   })
-  test('Author with most blogs of empty list', () => {
+  test('Author with most blogs of an empty list', () => {
     const temp_blogs = []
     const result = listHelper.mostBlogs(temp_blogs)
     expect(result).toEqual({})
@@ -107,9 +105,27 @@ describe('Total likes of a blog list', () => {
     const result = listHelper.totalLikes(blogs)
     expect(result).toBe(36)
   })
-  test('Total likes of empty list', () => {
+  test('Total likes of an empty list', () => {
     const temp_blogs = []
     const result = listHelper.totalLikes(temp_blogs)
     expect(result).toBe(0)
+  })
+})
+
+describe('Most likes of an author', () => {
+  test('Most likes of an author of a single blog', () => {
+    const temp_blogs = [blogs[0]]
+
+    const result = listHelper.mostLikes(temp_blogs)
+    expect(result).toEqual({ author: "Michael Chan", likes: 7 })
+  })
+  test('Most likes of an author of several blogs', () => {
+    const result = listHelper.mostLikes(blogs)
+    expect(result).toEqual({ author: "Edsger W. Dijkstra", likes: 17 })
+  })
+  test('Most likes of an author of an empty list', () => {
+    const temp_blogs = []
+    const result = listHelper.mostLikes(temp_blogs)
+    expect(result).toEqual({})
   })
 })
