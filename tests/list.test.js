@@ -77,6 +77,25 @@ describe('Blog with most likes', () => {
   })
 })
 
+describe('Author with most blogs', () => {
+  test('Author with most blogs of a single blog', () => {
+    const temp_blogs = [blogs[0]]
+
+    const result = listHelper.mostBlogs(temp_blogs)
+    expect(result).toEqual({ author: "Michael Chan", blogs: 1 })
+  })
+  test('Author with most blogs of several blogs', () => {
+    const result = listHelper.mostBlogs(blogs)
+    console.log(result)
+    expect(result).toEqual({ author: "Robert C. Martin", blogs: 3 })
+  })
+  test('Author with most blogs of empty list', () => {
+    const temp_blogs = []
+    const result = listHelper.mostBlogs(temp_blogs)
+    expect(result).toEqual({})
+  })
+})
+
 describe('Total likes of a blog list', () => {
   test('Total likes of a single blog', () => {
     const temp_blogs = [blogs[0]]

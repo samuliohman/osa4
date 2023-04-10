@@ -1,3 +1,5 @@
+var lodash = require('lodash');
+
 const dummy = () => {
   // ...
   return 1
@@ -18,6 +20,12 @@ const favoriteBlog = (blogs) => {
   return blogs.length !== 0 ? mostLikes : {}
 }
 
+const mostBlogs = (blogs) => {
+  const partitions = Object.values(lodash.groupBy(blogs, blog => blog.author))
+  const maxPartition = lodash.maxBy(partitions, part => part.length)
+  return blogs.length === 0 ? {} : { author: maxPartition[0].author, blogs: maxPartition.length }
+}
+
 module.exports = {
-  dummy, totalLikes, favoriteBlog
+  dummy, totalLikes, favoriteBlog, mostBlogs
 }
