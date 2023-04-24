@@ -103,6 +103,21 @@ test('Default likes must be set to 0', async () => {
   contents.forEach(c => expect(c).toBeDefined())
 })
 
+test('Testing bad request', async () => {
+  const newBlog1 = { author: "123123", url: "blogi.net" }
+  const newBlog2 = { title: "Cycling", author: "123123" }
+
+  await api.post('/api/blogs')
+    .send(newBlog1)
+    .expect(400)
+
+  await api.post('/api/blogs')
+    .send(newBlog2)
+    .expect(400)
+
+  const response = await api.get('/api/blogs')
+  expect(response.body).toHaveLength(initialBlogs.length)
+})
 
 afterAll(async () => {
   await mongoose.connection.close()
