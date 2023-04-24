@@ -119,6 +119,22 @@ test('Testing bad request', async () => {
   expect(response.body).toHaveLength(initialBlogs.length)
 })
 
+test('Deleting one post with id', async () => {
+  const response = await api.get('/api/blogs')
+  const id = response.body[0]._id
+  await api.delete(`/api/blogs/${id}`)
+    .expect(204)
+  const response2 = await api.get('/api/blogs')
+  expect(response2.body).toHaveLength(initialBlogs.length - 1)
+})
+
+test('Deleting post with unknown id', async () => {
+  await api.delete(`/api/blogs/5a422bc61b54a67623555555`)
+    .expect(404)
+  const response2 = await api.get('/api/blogs')
+  expect(response2.body).toHaveLength(initialBlogs.length)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
