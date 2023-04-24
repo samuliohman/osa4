@@ -27,14 +27,16 @@ const mostBlogs = (blogs) => {
 }
 
 const mostLikes = (blogs) => {
+  // author => List[blogs]
   var partitions = lodash.groupBy(blogs, blog => blog.author)
+  // author => Total likes
   Object.keys(partitions)
     .forEach(key => partitions[key] =
       partitions[key].reduce(
         (oldLikes, newElement) => oldLikes + newElement.likes,
         0
       ))
-
+  //author with most likes
   const keyWithHighestValue = Object.keys(partitions).reduce(
     (oldKey, newKey) => partitions[newKey] >= partitions[oldKey] ? newKey : oldKey,
     Object.keys(partitions)[0]
