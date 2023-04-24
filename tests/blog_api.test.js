@@ -135,6 +135,17 @@ test('Deleting post with unknown id', async () => {
   expect(response2.body).toHaveLength(initialBlogs.length)
 })
 
+test('Updating one post with id', async () => {
+  const response = await api.get('/api/blogs')
+  const original = response.body[0]
+  const newBlog = { ...original, likes: 799 }
+  await api.put(`/api/blogs/${original._id}`)
+    .send(newBlog)
+    .expect(200)
+  const response2 = await api.get('/api/blogs')
+  expect(response2.body[0].likes).toEqual(799)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
