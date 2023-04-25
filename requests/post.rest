@@ -2,7 +2,7 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "title": "Cycling2",
+    "title": "Cycling3",
     "author":"Samppa",
     "url": "blogi.net",
     "likes": 1750
