@@ -1,6 +1,6 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hdGlhcyIsImlkIjoiNjQ0ODIzYWE4MzQ3ZjFlNDg4NzExOWNmIiwiaWF0IjoxNjgyNDUwNzExfQ.zRPDvCSXmRWT0JfXZ82DVqlbdgQ3lNBq2syiUwPod14
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hdGlhczIiLCJpZCI6IjY0NDgyZmQ1MWZlZTBjMzgzZGFmM2VjNSIsImlhdCI6MTY5ODg1MjM5N30.-CCv-2zgeoTUm4HJ1FBnT_n6KyAU2oPUjBZ7MzoaIYs
 
 {
     "title": "AIG",

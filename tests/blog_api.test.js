@@ -3,7 +3,20 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/blog')
+const jwt = require('jsonwebtoken')
 mongoose.set('setDefaultsOnInsert', true);
+
+const testUserForToken = {
+  id: "64482fd51fee0c383daf3ec5",
+  username: "matias2"
+}
+
+const testUser = {
+  username: "matias2",
+  name: "Matias Sassali",
+  password: "123123"
+}
 
 const initialBlogs = [
   {
@@ -50,6 +63,10 @@ beforeEach(async () => {
   await Blog.deleteMany({})
   const blogsObjects = initialBlogs.map(blog => new Blog(blog))
   const saveArray = blogsObjects.map(b => b.save())
+  console.log("users:")
+  console.log(await User.find({}))
+  console.log("blogs:")
+  console.log(await Blog.find({}))
   await Promise.all(saveArray)
 })
 
@@ -78,6 +95,7 @@ test('Adding new blog increases the amount of blogs', async () => {
   }
 
   await api.post('/api/blogs')
+    .set('Authorization', `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hdGlhczIiLCJpZCI6IjY0NDgyZmQ1MWZlZTBjMzgzZGFmM2VjNSIsImlhdCI6MTY5ODg1MjM5N30.-CCv-2zgeoTUm4HJ1FBnT_n6KyAU2oPUjBZ7MzoaIYs`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
