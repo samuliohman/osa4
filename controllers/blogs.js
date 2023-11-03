@@ -1,7 +1,6 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
-const jwt = require('jsonwebtoken')
 const middleware = require('../utils/middleware.js')
 
 blogsRouter.get('/', async (request, response, next) => {
@@ -16,14 +15,7 @@ blogsRouter.get('/', async (request, response, next) => {
 blogsRouter.post('/', middleware.userExtractor, async (request, response, next) => {
   try {
     const body = request.body
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: 'token invalid' })
-    }
-
-    const user = await User.findById("64482fd51fee0c383daf3ec5")
-    console.log(user)
+    const user = request.user
     const blog = new Blog({ ...body, user: user._id })
     const result = await blog.save()
     user.blogs = user.blogs.concat(blog._id)
@@ -52,11 +44,13 @@ blogsRouter.put('/:id', async (request, response, next) => {
 
 blogsRouter.delete('/:id', middleware.userExtractor, async (request, response, next) => {
   try {
-    const user = request.user
     const blog = await Blog.findById(request.params.id)
-    const creator = await User.findById(blog.user.toString())
+    if (blog === null) {
+      return response.status(404).end()
+    }
 
-    if (creator._id.toString() !== user.id.toString()) {
+    const creator = await User.findById(blog.user.toString())
+    if (creator._id.toString() !== request.user.id.toString()) {
       return response.status(401).json({ error: 'Creator of blog is not you.' })
     }
 

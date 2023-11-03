@@ -3,19 +3,19 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
-const User = require('../models/blog')
+const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 mongoose.set('setDefaultsOnInsert', true);
 
-const testUserForToken = {
-  id: "64482fd51fee0c383daf3ec5",
-  username: "matias2"
-}
-
 const testUser = {
-  username: "matias2",
+  username: "matias3",
   name: "Matias Sassali",
   password: "123123"
+}
+
+const testUserForToken = {
+  id: null,
+  username: testUser.username
 }
 
 const initialBlogs = [
@@ -61,12 +61,14 @@ const initialBlogs = [
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
+  const user = new User(testUser)
+  await user.save()
+  const userObj = await User.findOne({});
+  const id = userObj._id.toString()
+  testUserForToken.id = id
   const blogsObjects = initialBlogs.map(blog => new Blog(blog))
   const saveArray = blogsObjects.map(b => b.save())
-  console.log("users:")
-  console.log(await User.find({}))
-  console.log("blogs:")
-  console.log(await Blog.find({}))
   await Promise.all(saveArray)
 })
 
@@ -95,13 +97,29 @@ test('Adding new blog increases the amount of blogs', async () => {
   }
 
   await api.post('/api/blogs')
-    .set('Authorization', `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hdGlhczIiLCJpZCI6IjY0NDgyZmQ1MWZlZTBjMzgzZGFmM2VjNSIsImlhdCI6MTY5ODg1MjM5N30.-CCv-2zgeoTUm4HJ1FBnT_n6KyAU2oPUjBZ7MzoaIYs`)
+    .set('Authorization', `Bearer ${jwt.sign(testUserForToken, process.env.SECRET)}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
   const response = await api.get('/api/blogs')
   expect(response.body).toHaveLength(initialBlogs.length + 1)
+})
+
+test('Adding new blog without authorization', async () => {
+  const newBlog = {
+    title: "Cycling",
+    author: "123123",
+    url: "blogi.net",
+    likes: 1250
+  }
+
+  await api.post('/api/blogs')
+    .send(newBlog)
+    .expect(401)
+
+  const response = await api.get('/api/blogs')
+  expect(response.body).toHaveLength(initialBlogs.length)
 })
 
 test('Default likes must be set to 0', async () => {
@@ -112,6 +130,7 @@ test('Default likes must be set to 0', async () => {
   }
 
   await api.post('/api/blogs')
+    .set('Authorization', `Bearer ${jwt.sign(testUserForToken, process.env.SECRET)}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -126,10 +145,12 @@ test('Testing bad request', async () => {
   const newBlog2 = { title: "Cycling", author: "123123" }
 
   await api.post('/api/blogs')
+    .set('Authorization', `Bearer ${jwt.sign(testUserForToken, process.env.SECRET)}`)
     .send(newBlog1)
     .expect(400)
 
   await api.post('/api/blogs')
+    .set('Authorization', `Bearer ${jwt.sign(testUserForToken, process.env.SECRET)}`)
     .send(newBlog2)
     .expect(400)
 
@@ -138,16 +159,30 @@ test('Testing bad request', async () => {
 })
 
 test('Deleting one post with id', async () => {
-  const response = await api.get('/api/blogs')
-  const id = response.body[0]._id
-  await api.delete(`/api/blogs/${id}`)
-    .expect(204)
+  const newBlog = {
+    title: "Cycling",
+    author: "123123",
+    url: "blogi.net",
+    likes: 1250
+  }
+  await api.post('/api/blogs')
+    .set('Authorization', `Bearer ${jwt.sign(testUserForToken, process.env.SECRET)}`)
+    .send(newBlog)
   const response2 = await api.get('/api/blogs')
-  expect(response2.body).toHaveLength(initialBlogs.length - 1)
+  expect(response2.body).toHaveLength(initialBlogs.length + 1)
+
+  const response = await api.get('/api/blogs')
+  const id = response.body[response.body.length - 1]._id
+  await api.delete(`/api/blogs/${id}`)
+    .set('Authorization', `Bearer ${jwt.sign(testUserForToken, process.env.SECRET)}`)
+    .expect(204)
+  const response3 = await api.get('/api/blogs')
+  expect(response3.body).toHaveLength(initialBlogs.length)
 })
 
 test('Deleting post with unknown id', async () => {
   await api.delete(`/api/blogs/5a422bc61b54a67623555555`)
+    .set('Authorization', `Bearer ${jwt.sign(testUserForToken, process.env.SECRET)}`)
     .expect(404)
   const response2 = await api.get('/api/blogs')
   expect(response2.body).toHaveLength(initialBlogs.length)
